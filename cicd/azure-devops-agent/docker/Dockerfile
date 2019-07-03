@@ -5,6 +5,8 @@ ARG NODE_VERSION=v10.13.0
 ARG DOTNET_MAJOR_VERSION=2
 ARG DOTNET_VERSION=2.2
 ARG DEVOPS_AGENT_VERSION=2.153.2
+ARG GIT_USER=sslaws
+
 ENV SUMMARY="Azure DevOps agent with .NET"  \
     DESCRIPTION="Azure DevOps agent with .NET v${DOTNET_VERSION}, nodejs v${NODE_VERSION}, Agent v${DEVOPS_AGENT_VERSION}"
 
@@ -54,10 +56,10 @@ RUN mkdir -p /opt/az/agent && \
 RUN curl -sL http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-RHEL6-x64.tgz | \
     tar -zx -C /
 
-RUN curl -sL https://github.com/jleach/openshift-components/blob/master/cicd/azure-devops-agent/git-2.21.0-bin.tgz?raw=true | \
+RUN curl -sL https://github.com/${GIT_USER}/openshift-components/blob/master/cicd/azure-devops-agent/git-2.21.0-bin.tgz?raw=true | \
     tar -zx -C / 
 
-RUN curl -sL https://raw.githubusercontent.com/jleach/openshift-components/master/cicd/azure-devops-agent/scripts/start.sh \
+RUN curl -sL https://raw.githubusercontent.com/${GIT_USER}openshift-components/master/cicd/azure-devops-agent/scripts/start.sh \
     -o /opt/az/start.sh && \
     chmod +x /opt/az/start.sh
 
