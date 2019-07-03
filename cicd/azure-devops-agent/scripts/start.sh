@@ -15,7 +15,16 @@
 # limitations under the License.
 #
 # Created by Jason Leach on 2019-06-20
+# Updated by Stephen Laws 2019-07-03
 #
+## Exit handler enabled after configuration of Agent
+cleanup() {
+    exitStatus=$?
+    trap - EXIT # clear the trap
+    echo Deregistering Agent
+    ./config.sh remove --unattended --auth PAT --token $AZ_DEVOPS_TOKEN
+    exit $exitStatus
+}
 
 set -Eeo pipefail
 
@@ -80,16 +89,19 @@ fi
 
 pushd $(dirname $0)/agent
 
-source ./env.sh
-
-./bin/Agent.Listener configure --unattended \
-    --agent "${AZ_DEVOPS_AGENT_NAME:-$(hostname)}" \
+echo Configuring Agent
+./config.sh --unattended \
+    --agent "${AZ_DEVOPS_AGENT_NAME:-$HOSTNAME}" \
     --url "${AZ_DEVOPS_ORG_URL}" \
     --auth PAT \
     --token $AZ_DEVOPS_TOKEN \
     --pool "${AZ_DEVOPS_POOL:-default}"\
     --work "$(dirname $0)/_work" \
-    --replace & wait $!
+    --replace
 
-./bin/Agent.Listener run & wait $!
+echo Registering interrupt trap
+trap cleanup EXIT SIGINT SIGTERM
+
+echo Starting agent
+./run.sh --once
 
