@@ -59,7 +59,7 @@ RUN curl -sL http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-RHEL6-x
 RUN curl -sL https://github.com/${GIT_USER}/openshift-components/blob/master/cicd/azure-devops-agent/git-2.21.0-bin.tgz?raw=true | \
     tar -zx -C / 
 
-RUN curl -sL https://raw.githubusercontent.com/${GIT_USER}openshift-components/master/cicd/azure-devops-agent/scripts/start.sh \
+RUN curl -sL https://raw.githubusercontent.com/${GIT_USER}/openshift-components/master/cicd/azure-devops-agent/scripts/start.sh \
     -o /opt/az/start.sh && \
     chmod +x /opt/az/start.sh
 
