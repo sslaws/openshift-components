@@ -66,7 +66,7 @@ RUN mkdir -p /opt && \
     rm -f node-${NODE_VERSION}-linux-x64.tar.xz
 
 ADD https://raw.githubusercontent.com/${GIT_USER}/openshift-components/master/cicd/azure-devops-agent/scripts/start.sh /opt/az/start.sh 
-RUN chmod +x /opt/az/start.sh
+RUN chmod +rx /opt/az/start.sh
 
 # Update environment variables
 ENV PATH=$PATH:/opt/rh/rh-dotnet22/root/bin:/opt/az/agent/bin:/usr/local/git/bin:/opt/node-${NODE_VERSION}-linux-x64/bin
