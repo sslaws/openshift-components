@@ -20,9 +20,14 @@
 ## Exit handler enabled after configuration of Agent
 cleanup() {
     exitStatus=$?
-    trap - EXIT # clear the trap
+    if [ ! -z ${AzureAgentPID+x} ]; then
+        echo "Killing AzureAgent ($AzureAgentPID) and children"
+        pkill -SIGTERM -P $AzureAgentPID
+        wait $AzureAgentPID
+    fi
     echo Deregistering Agent
     ./config.sh remove --unattended --auth PAT --token $AZ_DEVOPS_TOKEN
+    trap - EXIT SIGINT SIGTERM 
     exit $exitStatus
 }
 
@@ -89,19 +94,30 @@ fi
 
 pushd $(dirname $0)/agent
 
-echo Configuring Agent
-./config.sh --unattended \
-    --agent "${AZ_DEVOPS_AGENT_NAME:-$HOSTNAME}" \
-    --url "${AZ_DEVOPS_ORG_URL}" \
-    --auth PAT \
-    --token $AZ_DEVOPS_TOKEN \
-    --pool "${AZ_DEVOPS_POOL:-default}"\
-    --work "$(dirname $0)/_work" \
-    --replace
+if [ ! -f .agent ]; then
+    echo Configuring Agent
+    ./config.sh --unattended \
+        --acceptTeeEula \
+        --agent "${AZ_DEVOPS_AGENT_NAME:-$HOSTNAME}" \
+        --url "${AZ_DEVOPS_ORG_URL}" \
+        --auth PAT \
+        --token $AZ_DEVOPS_TOKEN \
+        --pool "${AZ_DEVOPS_POOL:-default}"\
+        --work "$(dirname $0)/_work" \
+        --replace
+else
+    echo Azure Agent already configured
+fi
 
-echo Registering interrupt trap
-trap cleanup EXIT SIGINT SIGTERM
+echo Registering exit trap
+trap cleanup SIGINT SIGTERM EXIT
+echo Script PID = $$
+echo $$ > agent.pid
 
-echo Starting agent
-./run.sh --once
-
+echo Starting agent at `date`
+./run.sh --once &
+AzureAgentPID=$!
+echo Azure Agent PID = $AzureAgentPID
+wait $AzureAgentPID
+unset AzureAgentPID
+echo Script Exiting
