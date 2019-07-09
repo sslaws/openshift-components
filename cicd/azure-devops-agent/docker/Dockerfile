@@ -85,17 +85,17 @@ RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
     node -v && \
     npm -v
 
-WORKDIR /opt/az/_work
-
-USER 1001
-
 # Install the SonarQube scanner for dotnet
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
 # Allow other users to execute the tools
-RUN chmod a+rx $HOME/.dotnet/tools/*
+RUN chmod -R a+rw $HOME
+RUN chmod a+x $HOME/.dotnet/tools/*
 # Fix nugget permissions
 RUN rm -rf /tmp/NuGetScratch/lock/*
 RUN chmod 777 /tmp/.nuget
 
+WORKDIR /opt/az/_work
+
+USER 1001
 
 CMD ["bash", "-c", "/opt/az/start.sh", "-u", "$AZ_DEVOPS_ORG_URL", "-t", "$AZ_DEVOPS_TOKEN"]
