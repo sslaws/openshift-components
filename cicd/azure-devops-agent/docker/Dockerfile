@@ -76,6 +76,9 @@ ENV AZ_DEVOPS_TOKEN=set_me_to_a_pat
 ENV HOME=/tmp
 ENV NODE_HOME=/opt/node-${NODE_VERSION}-linux-x64
 
+# Install the SonarQube scanner for dotnet
+RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
+
 # Update the version of `npm` that came with the packages above
 # and install a few additional tools.
 RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
