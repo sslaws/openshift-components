@@ -96,7 +96,7 @@ ENV TMP=$HOME/temp_nuget
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
 #RUN chmod a+rx $HOME/.dotnet/tools/dotnet-sonarscanner
 RUN rm -rf /tmp/NuGetScratch/lock/*
-#RUN chmod 777 /tmp/.nuget
+RUN chmod 777 /tmp/.nuget
 # Restore the temporary folder
 ENV TMP=
 
