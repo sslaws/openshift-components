@@ -88,8 +88,8 @@ RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
 # Install the SonarQube scanner for dotnet
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
 # Allow other users to execute the tools
-RUN chmod -R a+rw $HOME
-RUN chmod a+x $HOME/.dotnet/tools/*
+RUN chmod -R 777 $HOME
+#RUN chmod a+x $HOME/.dotnet/tools/*
 # Fix nugget permissions
 RUN rm -rf /tmp/NuGetScratch/lock/*
 RUN chmod 777 /tmp/.nuget
