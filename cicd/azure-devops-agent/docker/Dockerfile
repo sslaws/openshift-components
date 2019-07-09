@@ -75,6 +75,8 @@ ENV AZ_DEVOPS_ORG_URL=set_me_to_the_org_url
 ENV AZ_DEVOPS_TOKEN=set_me_to_a_pat
 ENV HOME=/tmp
 ENV NODE_HOME=/opt/node-${NODE_VERSION}-linux-x64
+ENV PATH=$HOME/.local/bin/:$PATH
+ENV PATH=$HOME/.dotnet/tools:$PATH
 
 # Install the SonarQube scanner for dotnet
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
