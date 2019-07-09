@@ -81,6 +81,7 @@ ENV PATH=$HOME/.dotnet/tools:$PATH
 # Install the SonarQube scanner for dotnet
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
 RUN chmod a+rx $HOME/.dotnet/tools/dotnet-sonarscanner
+RUN rm -rf /tmp/NuGetScratch/lock/*
 
 # Update the version of `npm` that came with the packages above
 # and install a few additional tools.
