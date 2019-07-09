@@ -89,10 +89,16 @@ WORKDIR /opt/az/_work
 
 USER 1001
 
+ENV TMP=$HOME/temp_nuget
+#RUN chmod 777 /tmp/.nuget
+
 # Install the SonarQube scanner for dotnet
 RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
 #RUN chmod a+rx $HOME/.dotnet/tools/dotnet-sonarscanner
 RUN rm -rf /tmp/NuGetScratch/lock/*
 #RUN chmod 777 /tmp/.nuget
+# Restore the temporary folder
+ENV TMP=
+
 
 CMD ["bash", "-c", "/opt/az/start.sh", "-u", "$AZ_DEVOPS_ORG_URL", "-t", "$AZ_DEVOPS_TOKEN"]
