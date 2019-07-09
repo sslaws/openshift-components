@@ -78,11 +78,6 @@ ENV NODE_HOME=/opt/node-${NODE_VERSION}-linux-x64
 ENV PATH=$HOME/.local/bin/:$PATH
 ENV PATH=$HOME/.dotnet/tools:$PATH
 
-# Install the SonarQube scanner for dotnet
-RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
-RUN chmod a+rx $HOME/.dotnet/tools/dotnet-sonarscanner
-RUN rm -rf /tmp/NuGetScratch/lock/*
-
 # Update the version of `npm` that came with the packages above
 # and install a few additional tools.
 RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
@@ -93,5 +88,11 @@ RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
 WORKDIR /opt/az/_work
 
 USER 1001
+
+# Install the SonarQube scanner for dotnet
+RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
+#RUN chmod a+rx $HOME/.dotnet/tools/dotnet-sonarscanner
+#RUN rm -rf /tmp/NuGetScratch/lock/*
+#RUN chmod 777 /tmp/.nuget
 
 CMD ["bash", "-c", "/opt/az/start.sh", "-u", "$AZ_DEVOPS_ORG_URL", "-t", "$AZ_DEVOPS_TOKEN"]
