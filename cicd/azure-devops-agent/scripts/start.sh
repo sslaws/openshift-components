@@ -26,7 +26,7 @@ cleanup() {
         wait $AzureAgentPID
     fi
     echo Deregistering Agent
-    ./config.sh remove --unattended --auth PAT --token $AZ_DEVOPS_TOKEN
+    ./config.sh remove --unattended --auth PAT --token $PAT_TOKEN
     trap - EXIT SIGINT SIGTERM 
     exit $exitStatus
 }
@@ -38,22 +38,21 @@ set -Eeo pipefail
 # -----------------------------------------------------------------------------------------------------------------
 usage() {
   cat <<-EOF
-  A helper script configure and start the Azure DevOps Agent.
+  A helper script to configure and start the Azure DevOps Agent.
 
-  Usage: ${0} [ -h -x -r <OpenShiftRegistryAddress>] -i <ImageName> -n <OpenShiftProjectNamespace> ]
+  Usage: ${0} [ -h -x -n <AgentName -p <AgentPool>] -u <OrganizationURL> -t <PAT> ]
 
   OPTIONS:
   ========
     -u The Azure DevOps Organization URL.
-       Example `https://fullboar.visualstudio.com`
+       Example https://fullboar.visualstudio.com
     -t The Personal Access Token (PAT) for this Agent.
-       Example `kd2kdkj2ojldkajdf4jr938jf9edjsdkfjdfj20e`
+       Example kd2kdkj2ojldkajdf4jr938jf9edjsdkfjdfj20e
     -n Optional. The name of the Agent.
        Defaults to hostname.
-       Example `d0e46b5cde65`
-    -p Optional.  The name of the pool you would like this
-       agent to belong to.
-       Defaults to `default`
+       Example d0e46b5cde65
+    -p Optional.  The name of the pool you would like this agent to be in.
+       Defaults to default
 
     -h prints the usage for the script
     -x run the script in debug mode to see what's happening
@@ -65,10 +64,12 @@ exit
 # -----------------------------------------------------------------------------------------------------------------
 # Initialization:
 # -----------------------------------------------------------------------------------------------------------------
+PAT_TOKEN=$AZ_DEVOPS_TOKEN
+unset AZ_DEVOPS_TOKEN
 while getopts u:t:n:p:hx FLAG; do
   case $FLAG in
     u ) export AZ_DEVOPS_ORG_URL=$OPTARG ;;
-    t ) export AZ_DEVOPS_TOKEN=$OPTARG ;;
+    t ) PAT_TOKEN=$OPTARG ;;
     n ) export AZ_DEVOPS_AGENT_NAME=$OPTARG ;;
     p ) export AZ_DEVOPS_POOL=$OPTARG ;;
     x ) export DEBUG=1 ;;
@@ -87,7 +88,7 @@ if [ ! -z "${DEBUG}" ]; then
   set -x
 fi
 
-if [ -z "${AZ_DEVOPS_ORG_URL}" ] || [ -z "${AZ_DEVOPS_TOKEN}" ]; then
+if [ -z "${AZ_DEVOPS_ORG_URL}" ] || [ -z "${PAT_TOKEN}" ]; then
   echo -e \\n"Missing parameters. Organization URL and Token are required."\\n
   usage
 fi
@@ -101,7 +102,7 @@ if [ ! -f .agent ]; then
         --agent "${AZ_DEVOPS_AGENT_NAME:-$HOSTNAME}" \
         --url "${AZ_DEVOPS_ORG_URL}" \
         --auth PAT \
-        --token $AZ_DEVOPS_TOKEN \
+        --token $PAT_TOKEN \
         --pool "${AZ_DEVOPS_POOL:-default}"\
         --work "$(dirname $0)/_work" \
         --replace
