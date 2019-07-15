@@ -33,7 +33,8 @@ RUN yum repolist > /dev/null && \
     yum-config-manager --enable rhel-7-server-dotnet-rpms && \
     yum-config-manager --enable rhel-7-server-ose-3.11-rpms && \
     INSTALL_PKGS="nss_wrapper libtool-ltdl \
-        scl-utils rh-dotnet22 atomic-openshift-clients" && \
+        scl-utils rh-dotnet22 atomic-openshift-clients \
+        java-11-openjdk-devel" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     # Remove redhat-logos (httpd dependency) to keep image size smaller.
@@ -75,6 +76,8 @@ ENV AZ_DEVOPS_ORG_URL=set_me_to_the_org_url
 ENV AZ_DEVOPS_TOKEN=set_me_to_a_pat
 ENV HOME=/tmp
 ENV NODE_HOME=/opt/node-${NODE_VERSION}-linux-x64
+ENV PATH=$HOME/.local/bin/:$PATH
+ENV PATH=$HOME/.dotnet/tools:$PATH
 
 # Update the version of `npm` that came with the packages above
 # and install a few additional tools.
@@ -82,6 +85,15 @@ RUN npm i -g npm@latest yarn@latest nsp@latest nodemon@latest && \
     rm -rf ~/.npm && \
     node -v && \
     npm -v
+
+# Install the SonarQube scanner for dotnet
+RUN dotnet tool install --global dotnet-sonarscanner --version 4.6.2
+# Allow other users to execute the tools
+RUN chmod -R 777 $HOME
+#RUN chmod a+x $HOME/.dotnet/tools/*
+# Fix nugget permissions
+RUN rm -rf /tmp/NuGetScratch/lock/*
+RUN chmod 777 /tmp/.nuget
 
 WORKDIR /opt/az/_work
 
